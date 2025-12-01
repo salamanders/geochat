@@ -53,6 +53,18 @@ fun RadarFeedScreen(
         Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
 
             Column(Modifier.fillMaxSize()) {
+                // Info Bar
+                if (uiState.debugRangeInfo.isNotEmpty()) {
+                    Text(
+                        text = uiState.debugRangeInfo,
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
                 // Debug Controls
                 DebugControls(
                     onMove = { lat, lng -> viewModel.debugMoveUser(lat, lng) }

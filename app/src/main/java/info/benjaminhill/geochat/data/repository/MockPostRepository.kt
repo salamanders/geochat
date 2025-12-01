@@ -8,7 +8,6 @@ import info.benjaminhill.geochat.domain.repository.LocationRepository
 import info.benjaminhill.geochat.domain.repository.PostRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
@@ -18,7 +17,7 @@ import kotlin.random.Random
 @Singleton
 class MockPostRepository @Inject constructor(
     private val authRepository: AuthRepository,
-    private val locationRepository: LocationRepository // To get current loc for sending
+    private val locationRepository: LocationRepository
 ) : PostRepository {
 
     // Center point for generating fake posts (Union Square)
@@ -28,64 +27,106 @@ class MockPostRepository @Inject constructor(
     private val _posts = MutableStateFlow<List<Post>>(emptyList())
 
     init {
-        // Generate some initial posts
-        val initialPosts = mutableListOf<Post>()
-
-        // 1. Very close post (10m)
-        initialPosts.add(createFakePost("Hey! I'm right next to you!", 0.0001, 0.0))
-
-        // 2. Medium distance (200m)
-        initialPosts.add(createFakePost("Anyone want to grab coffee?", 0.002, 0.001))
-
-        // 3. Far distance (800m)
-        initialPosts.add(createFakePost("Just arriving downtown.", 0.008, -0.005))
-
-        // 4. Too far (1200m) - should verify filtering logic in UI or Repo
-        initialPosts.add(createFakePost("I'm way over in SOMA.", 0.012, 0.012))
-
-        _posts.value = initialPosts
+        generateDiverseMockData()
     }
 
-    private fun createFakePost(text: String, latOffset: Double, lngOffset: Double): Post {
-        val lat = centerLat + latOffset
-        val lng = centerLng + lngOffset
+    private fun generateDiverseMockData() {
+        val posts = mutableListOf<Post>()
+        val now = System.currentTimeMillis()
+        val r = Random(123) // Fixed seed for reproducibility
+
+        // 1. Very Recent & Very Close (Density Burst)
+        // Simulate a crowd nearby posting right now
+        repeat(20) {
+            posts.add(
+                createFakePost(
+                    "Crowd member $it",
+                    centerLat + (r.nextDouble() - 0.5) * 0.0002, // ~20m spread
+                    centerLng + (r.nextDouble() - 0.5) * 0.0002,
+                    Date(now - r.nextLong(60_000)) // Last 1 minute
+                )
+            )
+        }
+
+        // 2. Recent (5 mins) & Medium Distance (500m)
+        repeat(30) {
+            posts.add(
+                createFakePost(
+                    "Nearby Walker $it",
+                    centerLat + (r.nextDouble() - 0.5) * 0.01, // ~1km spread
+                    centerLng + (r.nextDouble() - 0.5) * 0.01,
+                    Date(now - r.nextLong(300_000)) // Last 5 minutes
+                )
+            )
+        }
+
+        // 3. Older (1 Hour) & Farther (5km)
+        repeat(30) {
+            posts.add(
+                createFakePost(
+                    "City Dweller $it",
+                    centerLat + (r.nextDouble() - 0.5) * 0.1, // ~10km spread
+                    centerLng + (r.nextDouble() - 0.5) * 0.1,
+                    Date(now - r.nextLong(3_600_000)) // Last 1 hour
+                )
+            )
+        }
+
+        // 4. Very Old (1 Day) & Very Far (Global/Regional)
+        repeat(50) {
+            posts.add(
+                createFakePost(
+                    "Regional user $it",
+                    centerLat + (r.nextDouble() - 0.5) * 2.0, // ~200km spread
+                    centerLng + (r.nextDouble() - 0.5) * 2.0,
+                    Date(now - r.nextLong(86_400_000)) // Last 24 hours
+                )
+            )
+        }
+
+        // 5. Ancient History
+         repeat(50) {
+            posts.add(
+                createFakePost(
+                    "Ancient user $it",
+                    centerLat + (r.nextDouble() - 0.5) * 10.0, // ~1000km spread
+                    centerLng + (r.nextDouble() - 0.5) * 10.0,
+                    Date(now - r.nextLong(30L * 86_400_000)) // Last 30 days
+                )
+            )
+        }
+
+        _posts.value = posts
+    }
+
+    private fun createFakePost(text: String, lat: Double, lng: Double, timestamp: Date = Date()): Post {
         val plusCode = OpenLocationCode.encode(lat, lng)
         return Post(
             id = UUID.randomUUID().toString(),
-            userId = "other_user_${Random.nextInt(100)}",
-            userDisplayName = "Stranger ${Random.nextInt(100)}",
+            userId = "mock_user_${Random.nextInt(1000)}",
+            userDisplayName = "Stranger",
             text = text,
-            timestamp = Date(),
+            timestamp = timestamp,
             location = GeoPoint(lat, lng),
             plusCode = plusCode
         )
     }
 
     override fun getNearbyPosts(radiusInMeters: Double): Flow<List<Post>> {
-        // In a real app, we'd query Firestore. Here we just return the mock list.
-        // We could filter by radius here, but the UI logic usually handles the sorting/sizing.
-        // For strict correctness, we should filter.
         return _posts
     }
 
     override suspend fun sendPost(text: String) {
         val currentUser = authRepository.getCurrentUser() ?: return
 
-        // Getting the current location from the flow (hacky for mock, but works)
-        // In real world we'd take a snapshot or pass it in.
-        // For this mock, let's assume the user is at the "current" mock location.
-        // Since we don't have a synchronous way to get value from flow in interface easily without collection,
-        // we'll just assume a default or use the center for simplicity, OR better:
-        // Assume the ViewModel passes the location, but the interface signature is just text.
-        // Let's create a post at the center for now to ensure it's visible.
-
+        // Use center for simplicity in mock
         val newPost = Post(
             id = UUID.randomUUID().toString(),
             userId = currentUser.id,
             userDisplayName = currentUser.displayName,
             text = text,
             timestamp = Date(),
-            location = GeoPoint(centerLat, centerLng), // Ideally fetch actual current mock location
+            location = GeoPoint(centerLat, centerLng),
             plusCode = OpenLocationCode.encode(centerLat, centerLng)
         )
 

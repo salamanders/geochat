@@ -8,23 +8,28 @@ import info.benjaminhill.geochat.domain.model.Post
 import info.benjaminhill.geochat.domain.repository.LocationRepository
 import info.benjaminhill.geochat.domain.repository.PostRepository
 import info.benjaminhill.geochat.domain.util.DistanceUtils
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.Date
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 data class RadarUiState(
     val currentUserLocation: GeoPoint? = null,
-    val posts: List<PostWithMeta> = emptyList()
+    val posts: List<PostWithMeta> = emptyList(),
+    val debugRangeInfo: String = ""
 )
 
 data class PostWithMeta(
     val post: Post,
     val distanceMeters: Double,
-    val relevance: Float, // 0.0 to 1.0
+    val relevance: Float, // 0.0 to 1.0 (Based on Rank now)
     val fontSize: Float,
     val alpha: Float
 )
@@ -37,42 +42,119 @@ class RadarViewModel @Inject constructor(
 
     private val _currentLocation = locationRepository.getLocationUpdates()
 
-    // We combine location and posts to recalculate distance dynamically
+    // Ticker to refresh time-based filtering every second
+    private val _ticker = flow {
+        while (true) {
+            emit(System.currentTimeMillis())
+            delay(1000)
+        }
+    }
+
+    // We combine location, posts, and time ticker
     val uiState: StateFlow<RadarUiState> = combine(
         _currentLocation,
-        postRepository.getNearbyPosts(1000.0)
-    ) { location, posts ->
-        val processedPosts = posts.map { post ->
-            val distance = DistanceUtils.calculateDistance(location, post.location)
-            val relevance = DistanceUtils.calculateRelevance(distance)
-            PostWithMeta(
-                post = post,
-                distanceMeters = distance,
-                relevance = relevance,
-                fontSize = DistanceUtils.calculateFontSize(relevance),
-                alpha = DistanceUtils.calculateAlpha(relevance)
-            )
-        }.sortedBy { it.distanceMeters } // Sort by distance, closest first? Or newest? Spec says "newest at bottom".
-        // If newest at bottom, we sort by timestamp.
-        // Spec: "LazyColumn (list) with reverseLayout = true (newest at bottom)."
-        // So we should sort by timestamp descending (newest first) if reverseLayout=true, or ascending if reverseLayout=false.
-        // Actually, reverseLayout=true means index 0 is at the bottom.
-        // Usually, chat apps have newest at bottom. So if we have a list [Old, New], and reverseLayout=true,
-        // it renders [New, Old] visually from bottom up? No.
-        // reverseLayout=true renders the first item in the list at the bottom of the screen.
-        // So if we want newest at bottom, the list should be sorted [Newest, ..., Oldest].
-        // Let's stick to standard timestamp sorting for now.
-        .sortedByDescending { it.post.timestamp }
-
-        RadarUiState(
-            currentUserLocation = location,
-            posts = processedPosts
-        )
+        postRepository.getNearbyPosts(1000.0), // Currently returns all mock posts
+        _ticker
+    ) { location, allPosts, currentTime ->
+        processPosts(location, allPosts, currentTime)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = RadarUiState()
     )
+
+    private fun processPosts(location: GeoPoint, allPosts: List<Post>, currentTime: Long): RadarUiState {
+        // Algorithm Parameters
+        val minDisplayableCount = 10
+        val maxItems = 150
+        val targetDensityMsgPerSec = 0.5
+
+        // 1. Time Expansion Strategy
+        var timeWindowSeconds = 5 * 60L // Start with 5 minutes
+        var candidatePosts: List<Post>
+
+        // Expansion Levels: 5m -> 1h -> 24h -> 7d -> All
+        val expansionLevels = listOf(
+            5 * 60L,
+            60 * 60L,
+            24 * 60 * 60L,
+            7 * 24 * 60 * 60L,
+            Long.MAX_VALUE
+        )
+
+        var effectiveExpansionLevelIndex = 0
+
+        while (true) {
+             timeWindowSeconds = expansionLevels[effectiveExpansionLevelIndex]
+             candidatePosts = if (timeWindowSeconds == Long.MAX_VALUE) {
+                 allPosts
+             } else {
+                 allPosts.filter {
+                     val age = currentTime - it.timestamp.time
+                     age >= 0 && age <= timeWindowSeconds * 1000
+                 }
+             }
+
+             if (candidatePosts.size >= minDisplayableCount || effectiveExpansionLevelIndex == expansionLevels.lastIndex) {
+                 break
+             }
+             effectiveExpansionLevelIndex++
+        }
+
+        // 2. Density Filtering (Spatial)
+        // Calculate Distance for all candidates
+        val candidatesWithDist = candidatePosts.map { post ->
+            val dist = DistanceUtils.calculateDistance(location, post.location)
+            post to dist
+        }.sortedBy { it.second } // Closest first
+
+        // Determine Cutoff Count
+        // Target = TimeWindow * 0.5 msg/sec
+        // But capped at MAX_ITEMS
+        // Note: If TimeWindow is MAX_VALUE, we treat it as "Large enough to allow MAX_ITEMS"
+
+        val allowedCountByTime = if (timeWindowSeconds == Long.MAX_VALUE) {
+            maxItems
+        } else {
+            (timeWindowSeconds * targetDensityMsgPerSec).roundToInt()
+        }
+
+        val finalCount = allowedCountByTime.coerceIn(minDisplayableCount, maxItems)
+        val finalSelection = candidatesWithDist.take(finalCount)
+
+        // 3. Rank-Based Sizing
+        val totalSelected = finalSelection.size
+        val processedPosts = finalSelection.mapIndexed { index, (post, dist) ->
+            // Rank: 0.0 (Closest) to 1.0 (Farthest in selection)
+            // If only 1 item, rank is 0.
+            val rank = if (totalSelected > 1) {
+                index.toFloat() / (totalSelected - 1)
+            } else {
+                0f
+            }
+
+            // Relevance is Inverse of Rank (1.0 = Closest/Best, 0.0 = Farthest/Worst)
+            val relevance = 1f - rank
+
+            PostWithMeta(
+                post = post,
+                distanceMeters = dist,
+                relevance = relevance,
+                fontSize = DistanceUtils.calculateFontSize(relevance),
+                alpha = DistanceUtils.calculateAlpha(relevance)
+            )
+        }.sortedByDescending { it.post.timestamp } // Sort by Time for Display
+
+        // Debug Info
+        val rangeMeters = finalSelection.lastOrNull()?.second?.roundToInt() ?: 0
+        val timeDesc = if (timeWindowSeconds == Long.MAX_VALUE) "All Time" else "${timeWindowSeconds/60}m"
+
+        return RadarUiState(
+            currentUserLocation = location,
+            posts = processedPosts,
+            debugRangeInfo = "Time: $timeDesc | Range: ${rangeMeters}m | Count: $totalSelected"
+        )
+    }
 
     fun sendMessage(text: String) {
         viewModelScope.launch {
