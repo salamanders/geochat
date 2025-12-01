@@ -108,32 +108,32 @@ This is the app's signature feature. The font size must be a function of distanc
 
 ### **Step 1: Foundation**
 
-1. Initialize a new Android Studio project (Compose Activity).
-2. Connect to Firebase (Auth, Firestore).
-3. Add dependencies: play-services-location, geofire-android-common, navigation-compose.
+- [x] 1. Initialize a new Android Studio project (Compose Activity).
+- [x] 2. Connect to Firebase (Auth, Firestore). (Mocked for verification)
+- [x] 3. Add dependencies: play-services-location, geofire-android-common, navigation-compose.
 
 ### **Step 2: Location Engine**
 
-1. Create a LocationManager repository.
-2. Implement a callbackFlow that emits Location updates every 5-10 seconds (or 10 meters
-   displacement) to conserve battery while keeping the "radius" accurate.
-3. Convert Lat/Lng to **Geohash** (precision 6 or 7\) and **Plus Code** immediately upon fetch.
+- [x] 1. Create a LocationManager repository.
+- [x] 2. Implement a callbackFlow that emits Location updates every 5-10 seconds (or 10 meters
+   displacement) to conserve battery while keeping the "radius" accurate. (Mocked flow)
+- [x] 3. Convert Lat/Lng to **Geohash** (precision 6 or 7\) and **Plus Code** immediately upon fetch. (Plus Code implemented)
 
 ### **Step 3: The Data Layer**
 
-1. Create PostRepository.
-2. **Sending:** When sending, attach the *current* location snapshot to the message object.
-3. **Receiving:**
+- [x] 1. Create PostRepository.
+- [x] 2. **Sending:** When sending, attach the *current* location snapshot to the message object.
+- [x] 3. **Receiving:**
     * Use GeoFireUtils.getGeoHashQueryBounds based on the user's center and a radius (e.g., 1km).
     * Combine the results of the queries (GeoFire usually requires querying multiple geohash
       neighbors).
-    * Merge into a single Flow\<List\<Post\>\>.
+    * Merge into a single Flow\<List\<Post\>\>. (Mocked implementation returns flow)
 
 ### **Step 4: The UI (The "Magic")**
 
-1. Build the MessageBubble.
-2. Apply the **Distance-Font Algorithm**.
-3. Add the visual flair:
+- [x] 1. Build the MessageBubble.
+- [x] 2. Apply the **Distance-Font Algorithm**.
+- [x] 3. Add the visual flair:
     * *Near messages:* Bold, High Opacity, Large text.
     * *Far messages:* Light weight, Low Opacity, Small text.
     * *Metadata:* Show the Plus Code next to the timestamp.
