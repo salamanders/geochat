@@ -18,6 +18,23 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import info.benjaminhill.geochat.ui.components.ProximityMessageRow
 
+/**
+ * The main screen of the application displaying the "Radar" feed.
+ *
+ * **Purpose:**
+ * This Composable is the visual container for the chat experience. It assembles the list of
+ * messages, the input bar, and the debug controls into a coherent screen.
+ *
+ * **Architecture:**
+ * - **Layer:** UI (Screen).
+ * - **Relations:**
+ *   - Observes [RadarViewModel] for state changes.
+ *   - Renders a list of [ProximityMessageRow]s.
+ *   - Handles user input and delegates actions (send, move) back to the ViewModel.
+ *
+ * **Why keep it?**
+ * It is the primary "View" in the MVVM pattern for the chat feature.
+ */
 @Composable
 fun RadarFeedScreen(
     viewModel: RadarViewModel = hiltViewModel()
@@ -85,6 +102,12 @@ fun RadarFeedScreen(
     }
 }
 
+/**
+ * A UI component for typing and sending messages.
+ *
+ * **Purpose:**
+ * Captures user text input and triggers the send action.
+ */
 @Composable
 fun InputBar(
     text: String,
@@ -111,6 +134,13 @@ fun InputBar(
     }
 }
 
+/**
+ * A temporary UI component for simulating movement in the mock environment.
+ *
+ * **Purpose:**
+ * Allows the developer to "walk" around the virtual world by modifying the mock location
+ * provided by [info.benjaminhill.geochat.data.repository.MockLocationRepository].
+ */
 @Composable
 fun DebugControls(
     onMove: (Double, Double) -> Unit

@@ -20,6 +20,22 @@ import info.benjaminhill.geochat.ui.radar.PostWithMeta
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+/**
+ * A list item representing a single nearby message.
+ *
+ * **Purpose:**
+ * This Composable renders the visual representation of a post. It is "dumb" - it simply
+ * draws whatever font size and opacity it is told to use.
+ *
+ * **Architecture:**
+ * - **Layer:** UI (Component).
+ * - **Relations:**
+ *   - Used by [info.benjaminhill.geochat.ui.radar.RadarFeedScreen] in a LazyColumn.
+ *   - Consumes [PostWithMeta] which contains the pre-calculated visual properties.
+ *
+ * **Why keep it?**
+ * It isolates the specific styling logic for a message row, making the main screen code cleaner.
+ */
 @Composable
 fun ProximityMessageRow(
     postWithMeta: PostWithMeta,

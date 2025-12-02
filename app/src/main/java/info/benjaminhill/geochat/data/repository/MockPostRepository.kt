@@ -14,6 +14,26 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
 
+/**
+ * A simulation of the backend database (Firestore).
+ *
+ * **Purpose:**
+ * This class provides a pre-filled list of fake posts scattered around a central location.
+ * It is designed to stress-test the UI's filtering and sorting logic by including posts
+ * at varying distances (from 20m to 1000km) and ages (1 minute to 30 days).
+ *
+ * **Architecture:**
+ * - **Layer:** Data Layer (Implementation).
+ * - **Relations:**
+ *   - Implements [info.benjaminhill.geochat.domain.repository.PostRepository].
+ *   - Consumes [AuthRepository] to get the current user for new posts.
+ *   - Consumes [LocationRepository] to simulate where new posts are created.
+ *
+ * **Why keep it?**
+ * It is the primary data source for the current "Phase 1" of development. It ensures the
+ * "Radar" UI works correctly (showing near items big, far items small) without needing a
+ * live internet connection or a populated database.
+ */
 @Singleton
 class MockPostRepository @Inject constructor(
     private val authRepository: AuthRepository,
