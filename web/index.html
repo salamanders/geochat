@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geochat Web</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Open Location Code (Plus Codes) -->
+    <script src="https://cdn.jsdelivr.net/npm/open-location-code@1.0.3/openlocationcode.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Geochat</h1>
+            <div id="status-bar">
+                <span id="connection-status">Connecting...</span> |
+                <span id="location-display">Acquiring location...</span>
+            </div>
+        </header>
+
+        <main id="message-feed">
+            <!-- Messages will be injected here -->
+        </main>
+
+        <footer>
+            <form id="message-form">
+                <input type="text" id="message-input" placeholder="Say something nearby..." maxlength="500" autocomplete="off" disabled>
+                <button type="submit" id="send-button" disabled>Send</button>
+            </form>
+        </footer>
+    </div>
+
+    <!-- Main Application Logic -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>
