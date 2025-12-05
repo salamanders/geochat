@@ -1,7 +1,11 @@
 package info.benjaminhill.geochat.domain.util
 
 import info.benjaminhill.geochat.domain.model.GeoPoint
-import kotlin.math.*
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 /**
  * A utility singleton for geospatial calculations and UI scaling logic.

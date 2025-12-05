@@ -105,7 +105,7 @@ class MockPostRepository @Inject constructor(
         }
 
         // 5. Ancient History
-         repeat(50) {
+        repeat(50) {
             posts.add(
                 createFakePost(
                     "Ancient user $it",
@@ -119,7 +119,12 @@ class MockPostRepository @Inject constructor(
         _posts.value = posts
     }
 
-    private fun createFakePost(text: String, lat: Double, lng: Double, timestamp: Date = Date()): Post {
+    private fun createFakePost(
+        text: String,
+        lat: Double,
+        lng: Double,
+        timestamp: Date = Date()
+    ): Post {
         val plusCode = OpenLocationCode.encode(lat, lng)
         return Post(
             id = UUID.randomUUID().toString(),

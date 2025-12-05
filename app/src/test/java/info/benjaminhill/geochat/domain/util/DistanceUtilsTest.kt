@@ -2,7 +2,6 @@ package info.benjaminhill.geochat.domain.util
 
 import info.benjaminhill.geochat.domain.model.GeoPoint
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class DistanceUtilsTest {

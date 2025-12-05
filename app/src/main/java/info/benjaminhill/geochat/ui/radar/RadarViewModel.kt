@@ -8,7 +8,6 @@ import info.benjaminhill.geochat.domain.model.Post
 import info.benjaminhill.geochat.domain.repository.LocationRepository
 import info.benjaminhill.geochat.domain.repository.PostRepository
 import info.benjaminhill.geochat.domain.util.DistanceUtils
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -121,12 +120,14 @@ class RadarViewModel @Inject constructor(
         // Filter by time window initially (5 mins)
         val now = System.currentTimeMillis()
         var timeWindowSeconds = 300L // 5 mins
-        var filteredByTime = postsWithDist.filter { (now - it.first.timestamp.time) < (timeWindowSeconds * 1000) }
+        var filteredByTime =
+            postsWithDist.filter { (now - it.first.timestamp.time) < (timeWindowSeconds * 1000) }
 
         if (filteredByTime.size < 5) {
             // Expand time to 1 hour
             timeWindowSeconds = 3600L
-            filteredByTime = postsWithDist.filter { (now - it.first.timestamp.time) < (timeWindowSeconds * 1000) }
+            filteredByTime =
+                postsWithDist.filter { (now - it.first.timestamp.time) < (timeWindowSeconds * 1000) }
         }
 
         if (filteredByTime.size < 5) {
@@ -162,7 +163,8 @@ class RadarViewModel @Inject constructor(
 
         // Debug Info
         val rangeMeters = finalSelection.lastOrNull()?.second?.roundToInt() ?: 0
-        val timeDesc = if (timeWindowSeconds == Long.MAX_VALUE) "All Time" else "${timeWindowSeconds/60}m"
+        val timeDesc =
+            if (timeWindowSeconds == Long.MAX_VALUE) "All Time" else "${timeWindowSeconds / 60}m"
 
         return RadarUiState(
             currentUserLocation = location,
