@@ -28,9 +28,9 @@ export ANDROID_HOME="$HOME/Android/sdk"
 
 
 # Create local.properties if it doesn't exist
-if [ ! -f "app/local.properties" ]; then
-    echo "Creating app/local.properties..."
-    echo "sdk.dir=$HOME/Android/sdk" > app/local.properties
+if [ ! -f "local.properties" ]; then
+    echo "Creating local.properties..."
+    echo "sdk.dir=$HOME/Android/sdk" > local.properties
 fi
 
 # Add properties to gradle.properties if they don't already exist
