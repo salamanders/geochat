@@ -1,20 +1,20 @@
 # Firestore Setup & Integration Guide
 
-This guide provides step-by-step instructions to set up the Firebase backend for **Geochat** and integrate it into the Android project.
+This guide provides step-by-step instructions to set up the Firebase backend for **geochat** and integrate it into the Android project.
 
 ## **Part 1: Firebase Console Setup**
 
 ### **1. Create a Firebase Project**
 1. Go to the [Firebase Console](https://console.firebase.google.com/).
 2. Click **Add project**.
-3. Name it **Geochat** (or similar).
+3. Name it **geochat** (or similar).
 4. Disable Google Analytics for this project (simplifies setup), or keep it if desired.
 5. Click **Create project**.
 
 ### **2. Add the Android App**
 1. In the project overview, click the **Android icon** (bugdroid) to add an app.
 2. **Android package name**: `info.benjaminhill.geochat` (Matches `app/build.gradle.kts`).
-3. **App nickname**: Geochat.
+3. **App nickname**: geochat.
 4. **Debug signing certificate SHA-1**:
    - You can get this from Android Studio or the command line.
    - **Command Line (Mac/Linux):**
@@ -30,7 +30,7 @@ This guide provides step-by-step instructions to set up the Firebase backend for
 
 ### **3. Download Config File**
 1. Download the `google-services.json` file.
-2. Move this file into the `app/` directory of the project: `Geochat/app/google-services.json`.
+2. Move this file into the `app/` directory of the project: `geochat/app/google-services.json`.
 3. Click **Next** in the console until you finish the wizard.
 
 ---

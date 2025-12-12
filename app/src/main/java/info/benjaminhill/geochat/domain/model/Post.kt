@@ -6,7 +6,7 @@ import java.util.Date
  * Represents a single message broadcast by a user at a specific location and time.
  *
  * **Purpose:**
- * This is the core data unit of the Geochat application. It bundles the "content" (text)
+ * This is the core data unit of the geochat application. It bundles the "content" (text)
  * with the "context" (who, where, when) required to render the distance-based UI.
  *
  * **Architecture:**

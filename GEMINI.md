@@ -1,8 +1,8 @@
-# **Project: Geochat \- Proximity Chat Architecture**
+# **Project: geochat \- Proximity Chat Architecture**
 
 ## **1\. Project Overview**
 
-**Geochat** is a geo-spatial, real-time Android chat application where the visual presentation of
+**geochat** is a geo-spatial, real-time Android chat application where the visual presentation of
 messages correlates directly to the physical distance of the sender.
 
 The Core Loop: 1\. Users broadcast messages tagged with their precise location.  

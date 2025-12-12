@@ -4,7 +4,7 @@ import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 /**
- * The application entry point for the Geochat app.
+ * The application entry point for the geochat app.
  *
  * **Purpose:**
  * This class is required by Hilt to trigger the dependency injection code generation.

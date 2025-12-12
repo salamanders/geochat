@@ -20,6 +20,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Geochat"
+rootProject.name = "geochat"
 include(":app")
- 

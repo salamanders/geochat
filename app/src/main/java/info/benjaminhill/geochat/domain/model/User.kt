@@ -1,7 +1,7 @@
 package info.benjaminhill.geochat.domain.model
 
 /**
- * Represents an authenticated user in the Geochat application.
+ * Represents an authenticated user in the geochat application.
  *
  * **Purpose:**
  * This data class exists to encapsulate the core identity information of a user (ID and display name)

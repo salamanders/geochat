@@ -1,12 +1,12 @@
-# Geochat: The World is Your Chatroom
+# geochat: The World is Your Chatroom
 
 > **"What if your text messages could fade away as you walked away?"**
 
-Geochat is a proximity-based, real-time chat application where the physical world dictates your digital conversation. Unlike traditional chat apps that connect you with contacts across the globe, Geochat connects you with the people standing right next to you.
+geochat is a proximity-based, real-time chat application where the physical world dictates your digital conversation. Unlike traditional chat apps that connect you with contacts across the globe, geochat connects you with the people standing right next to you.
 
-## Why Geochat?
+## Why geochat?
 
-In a world of infinite connectivity, we often ignore our immediate surroundings. Geochat brings the focus back to **here and now**.
+In a world of infinite connectivity, we often ignore our immediate surroundings. geochat brings the focus back to **here and now**.
 
 *   **Concerts & Festivals:** Shout to the crowd around you.
 *   **Conferences:** Find others in the same hall without exchanging numbers.
@@ -17,20 +17,20 @@ In a world of infinite connectivity, we often ignore our immediate surroundings.
 
 ## How It Works
 
-The core of Geochat is its **Distance-Font Algorithm**. The visual presentation of a message is directly correlated to the physical distance between the sender and the receiver.
+The core of geochat is its **Distance-Font Algorithm**. The visual presentation of a message is directly correlated to the physical distance between the sender and the receiver.
 
 *   **Close neighbors (0-50m):** Messages appear **Large, Bold, and Opaque**. They demand attention.
 *   **Distant neighbors (500m+):** Messages appear **Tiny, Faint, and Transparent**. They fade into the background noise.
 *   **Time:** All messages naturally drift away and vanish as time passes.
 
-![Geochat Screenshot](screenshot.png)
+![geochat Screenshot](screenshot.png)
 *(Screenshot coming soon)*
 
 ---
 
 ## Technology Stack
 
-Geochat is built with the absolute latest modern Android standards, including Kotlin, Jetpack Compose, Hilt, and Coroutines.
+geochat is built with the absolute latest modern Android standards, including Kotlin, Jetpack Compose, Hilt, and Coroutines.
 
 **[See `GEMINI.md` for the detailed Tech Stack and Architecture decisions.](./GEMINI.md)**
 
