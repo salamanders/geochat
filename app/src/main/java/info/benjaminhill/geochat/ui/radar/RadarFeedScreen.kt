@@ -13,11 +13,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -36,7 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import info.benjaminhill.geochat.ui.components.ProximityMessageRow
 
 /**
@@ -157,7 +157,7 @@ fun InputBar(
         )
         Spacer(modifier = Modifier.width(8.dp))
         IconButton(onClick = onSend) {
-            Icon(Icons.Default.Send, contentDescription = "Send")
+            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
         }
     }
 }
@@ -200,10 +200,10 @@ fun DebugControls(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 IconButton(onClick = { onMove(0.0, -0.0005) }) { // ~50m West
-                    Icon(Icons.Default.ArrowBack, "West")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "West")
                 }
                 IconButton(onClick = { onMove(0.0, 0.0005) }) { // ~50m East
-                    Icon(Icons.Default.ArrowForward, "East")
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward, "East")
                 }
             }
             Row(
